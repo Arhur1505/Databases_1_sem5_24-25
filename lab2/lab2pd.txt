@@ -1,0 +1,47 @@
+CREATE SCHEMA zadanie2;
+SET SEARCH_PATH TO zadanie2;
+CREATE TABLE zadanie2.ksiazka_telefoniczna (id int, nazwisko VARCHAR(30), imie VARCHAR(30), telefon VARCHAR(15), miejscowosc VARCHAR(30), kod VARCHAR(10), ulica VARCHAR(30), numer_mieszkania VARCHAR(10), opis VARCHAR(255));
+
+ALTER TABLE zadanie2.ksiazka_telefoniczna ADD primary key (id);
+
+ALTER TABLE ksiazka_telefoniczna
+ALTER COLUMN nazwisko SET NOT NULL;
+
+ALTER TABLE ksiazka_telefoniczna
+ALTER COLUMN imie SET NOT NULL;
+
+ALTER TABLE ksiazka_telefoniczna
+ALTER COLUMN telefon SET NOT NULL;
+
+INSERT INTO zadanie2.ksiazka_telefoniczna (id, nazwisko, imie, telefon, miejscowosc, kod, ulica, numer_mieszkania, opis)
+VALUES
+    (1, 'Kowalski', 'Jan', '123456789', 'Warszawa', '00-001', 'Kwiatowa', '12', 'Znajomy z pracy'),
+    (2, 'Nowak', 'Anna', '987654321', 'Kraków', '30-001', 'Lipowa', '5', 'Sąsiadka'),
+    (3, 'Wiśniewski', 'Piotr', '555666777', 'Gdańsk', '80-001', 'Brzozowa', '10', 'Kolega ze studiów'),
+    (4, 'Zielińska', 'Magda', '444555666', 'Wrocław', '50-001', 'Topolowa', '22', 'Rodzina'),
+    (5, 'Lewandowski', 'Robert', '111222333', 'Poznań', '60-001', 'Dębowa', '15', 'Przyjaciel'),
+    (6, 'Mazur', 'Ewa', '222333444', 'Szczecin', '70-001', 'Jesionowa', '8', 'Znajoma z klubu'),
+    (7, 'Dąbrowski', 'Adam', '333444555', 'Łódź', '90-001', 'Wierzbowa', '19', 'Kolega z pracy'),
+    (8, 'Wojciechowska', 'Maria', '444333222', 'Lublin', '20-001', 'Grabowa', '4', 'Kuzynka'),
+    (9, 'Kwiatkowski', 'Tomasz', '666777888', 'Bydgoszcz', '85-001', 'Sosnowa', '9', 'Znajomy z siłowni'),
+    (10, 'Jankowski', 'Zofia', '999888777', 'Białystok', '15-001', 'Bukowa', '3', 'Znajoma ze szkoły'),
+    (11, 'Szymański', 'Michał', '888777666', 'Opole', '45-001', 'Modrzewiowa', '7', 'Kolega ze studiów'),
+    (12, 'Zalewska', 'Karolina', '777666555', 'Rzeszów', '35-001', 'Cedrowa', '11', 'Sąsiadka');
+
+SELECT * FROM zadanie2.ksiazka_telefoniczna;
+SELECT nazwisko, imie, telefon FROM zadanie2.ksiazka_telefoniczna ORDER BY nazwisko;
+
+SELECT * FROM zadanie2.ksiazka_telefoniczna WHERE nazwisko = 'Kowalski';
+SELECT * FROM zadanie2.ksiazka_telefoniczna WHERE imie = 'Anna';
+SELECT * FROM zadanie2.ksiazka_telefoniczna WHERE telefon = '123456789';
+SELECT * FROM zadanie2.ksiazka_telefoniczna WHERE miejscowosc = 'Warszawa';
+
+UPDATE zadanie2.ksiazka_telefoniczna SET telefon = '111111111' WHERE nazwisko = 'Kowalski' AND imie = 'Jan';
+DELETE FROM zadanie2.ksiazka_telefoniczna WHERE id = 5;
+UPDATE zadanie2.ksiazka_telefoniczna SET opis = 'Stary znajomy z liceum' WHERE nazwisko = 'Nowak' AND imie = 'Anna';
+
+
+
+
+
+

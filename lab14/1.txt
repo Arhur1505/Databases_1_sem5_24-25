@@ -1,0 +1,40 @@
+SET SEARCH_PATH TO kurs;
+
+-- Zadanie 1 --
+
+SELECT 
+    imie, 
+    nazwisko, 
+    'W' AS opis
+FROM wykladowca
+UNION ALL
+SELECT 
+    imie, 
+    nazwisko, 
+    'U' AS opis
+FROM uczestnik
+ORDER BY opis, nazwisko, imie;
+
+-- Zadanie 2 --
+
+SELECT 
+    u.imie, 
+    u.nazwisko, 
+    SUM(uk.oplata) AS suma_oplat
+FROM uczest_kurs uk
+JOIN uczestnik u ON uk.id_uczest = u.id_uczestnik
+GROUP BY u.imie, u.nazwisko
+HAVING SUM(uk.oplata) > 2000 -- Wstaw wartosc progu
+ORDER BY suma_oplat DESC;
+
+-- Zadanie 3 --
+
+SELECT 
+    k.id_kurs, 
+    ko.opis AS kurs_opis, 
+    AVG(uk.oplata) AS srednia_oplata
+FROM uczest_kurs uk
+JOIN kurs k ON uk.id_kurs = k.id_kurs
+JOIN kurs_opis ko ON k.id_nazwa = ko.id_nazwa
+GROUP BY k.id_kurs, ko.opis
+ORDER BY srednia_oplata DESC;

@@ -1,0 +1,104 @@
+Statystyka kursów 1.
+
+SELECT 
+    z.id_kurs, 
+    z.id_zaj, 
+    SUM(uz.obec) AS sum
+FROM 
+    zajecia z
+LEFT JOIN 
+    uczest_zaj uz 
+ON 
+    z.id_kurs = uz.id_kurs AND z.id_zaj = uz.id_zaj
+GROUP BY 
+    z.id_kurs, z.id_zaj
+ORDER BY 
+    z.id_kurs, z.id_zaj;
+
+Statystyka kursów 2.
+
+CREATE EXTENSION IF NOT EXISTS tablefunc;
+
+WITH crosstab_data AS (
+    SELECT *
+    FROM crosstab(
+        'SELECT 
+             z.id_kurs AS grupa, 
+             z.id_zaj AS zaj, 
+             SUM(uz.obec) AS sum
+         FROM 
+             zajecia z
+         LEFT JOIN 
+             uczest_zaj uz 
+         ON 
+             z.id_kurs = uz.id_kurs AND z.id_zaj = uz.id_zaj
+         GROUP BY 
+             z.id_kurs, z.id_zaj
+         ORDER BY 
+             z.id_kurs, z.id_zaj',
+        'SELECT generate_series(1, 10)'
+    ) AS ct(grupa INT, z1 INT, z2 INT, z3 INT, z4 INT, z5 INT, z6 INT, z7 INT, z8 INT, z9 INT, z10 INT)
+),
+row_sums AS (
+    SELECT 
+        grupa, 
+        z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, 
+        (COALESCE(z1, 0) + COALESCE(z2, 0) + COALESCE(z3, 0) + COALESCE(z4, 0) + 
+         COALESCE(z5, 0) + COALESCE(z6, 0) + COALESCE(z7, 0) + COALESCE(z8, 0) + 
+         COALESCE(z9, 0) + COALESCE(z10, 0)) AS a
+    FROM crosstab_data
+),
+column_sums AS (
+    SELECT 
+        NULL::INT AS grupa, 
+        SUM(z1) AS z1, SUM(z2) AS z2, SUM(z3) AS z3, SUM(z4) AS z4, SUM(z5) AS z5, 
+        SUM(z6) AS z6, SUM(z7) AS z7, SUM(z8) AS z8, SUM(z9) AS z9, SUM(z10) AS z10,
+        SUM(COALESCE(z1, 0) + COALESCE(z2, 0) + COALESCE(z3, 0) + COALESCE(z4, 0) +
+            COALESCE(z5, 0) + COALESCE(z6, 0) + COALESCE(z7, 0) + COALESCE(z8, 0) +
+            COALESCE(z9, 0) + COALESCE(z10, 0)) AS a
+    FROM crosstab_data
+)
+SELECT * FROM row_sums
+UNION ALL
+SELECT * FROM column_sums
+ORDER BY grupa NULLS LAST;
+
+Statystyka kursów 3.
+
+WITH session_sums AS (
+    SELECT 
+        z.id_kurs, 
+        z.id_zaj, 
+        SUM(uz.obec) AS suma
+    FROM 
+        zajecia z
+    LEFT JOIN 
+        uczest_zaj uz 
+    ON 
+        z.id_kurs = uz.id_kurs AND z.id_zaj = uz.id_zaj
+    GROUP BY 
+        z.id_kurs, z.id_zaj
+),
+course_sums AS (
+    SELECT 
+        id_kurs, 
+        SUM(suma) AS sum 
+    FROM 
+        session_sums 
+    GROUP BY 
+        id_kurs
+)
+SELECT 
+    ss.id_kurs, 
+    ss.id_zaj, 
+    ROW_NUMBER() OVER (PARTITION BY ss.id_kurs ORDER BY ss.suma DESC) AS row_number, 
+    ss.suma, 
+    cs.sum
+FROM 
+    session_sums ss
+JOIN 
+    course_sums cs 
+ON 
+    ss.id_kurs = cs.id_kurs
+ORDER BY 
+    ss.id_kurs, row_number;

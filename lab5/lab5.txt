@@ -1,0 +1,30 @@
+SELECT 
+    ko.opis AS nazwa_kursu,
+    CAST((COUNT(uk.id_uczest) * 100.0 / (SELECT COUNT(*) FROM uczest_kurs)) AS DECIMAL(5, 2)) AS udzial_procentowy_uczestnikow,
+    CAST((SUM(CASE WHEN uk.ocena >= 4 THEN 1 ELSE 0 END) * 100.0 / COUNT(uk.id_uczest)) AS DECIMAL(5, 2)) AS udzial_procentowy_ocen
+FROM 
+    kurs_opis ko
+JOIN 
+    kurs k ON ko.id_nazwa = k.id_nazwa
+JOIN 
+    uczest_kurs uk ON k.id_kurs = uk.id_kurs
+GROUP BY 
+    ko.opis;
+
+SELECT 
+    u.imie || ' ' || u.nazwisko AS imie_nazwisko,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 1) THEN 'tak' ELSE 'nie' END AS kurs_1,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 2) THEN 'tak' ELSE 'nie' END AS kurs_2,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 3) THEN 'tak' ELSE 'nie' END AS kurs_3,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 4) THEN 'tak' ELSE 'nie' END AS kurs_4,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 5) THEN 'tak' ELSE 'nie' END AS kurs_5,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 6) THEN 'tak' ELSE 'nie' END AS kurs_6,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 7) THEN 'tak' ELSE 'nie' END AS kurs_7,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 8) THEN 'tak' ELSE 'nie' END AS kurs_8,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 9) THEN 'tak' ELSE 'nie' END AS kurs_9,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 10) THEN 'tak' ELSE 'nie' END AS kurs_10,
+    CASE WHEN EXISTS (SELECT 1 FROM uczest_kurs uk WHERE uk.id_uczest = u.id_uczestnik AND uk.id_kurs = 11) THEN 'tak' ELSE 'nie' END AS kurs_11
+FROM 
+    uczestnik u
+ORDER BY 
+    imie_nazwisko;

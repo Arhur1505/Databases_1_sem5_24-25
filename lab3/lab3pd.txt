@@ -1,0 +1,69 @@
+CREATE SCHEMA zadanie3;
+SET search_path TO zadanie3;
+
+CREATE TABLE zadanie3.KLIENT (
+    ID_KLIENTA SERIAL PRIMARY KEY,
+    Imie VARCHAR(50),
+    Nazwisko VARCHAR(50),
+    Email VARCHAR(100)
+);
+
+CREATE TABLE zadanie3.ZAMOWIENIE (
+    ID_ZAMOWIENIA SERIAL PRIMARY KEY,
+    Data DATE,
+    ID_KLIENTA INT,
+    FOREIGN KEY (ID_KLIENTA) REFERENCES KLIENT(ID_KLIENTA)
+);
+
+CREATE TABLE zadanie3.TOWAR (
+    ID_TOWARU SERIAL PRIMARY KEY,
+    Nazwa VARCHAR(100),
+    Cena DECIMAL(10, 2)
+);
+
+CREATE TABLE zadanie3.ZAMOWIENIE_TOWAR (
+    ID_ZAMOWIENIA INT,
+    ID_TOWARU INT,
+    Ilosc INT,
+    PRIMARY KEY (ID_ZAMOWIENIA, ID_TOWARU),
+    FOREIGN KEY (ID_ZAMOWIENIA) REFERENCES ZAMOWIENIE(ID_ZAMOWIENIA),
+    FOREIGN KEY (ID_TOWARU) REFERENCES TOWAR(ID_TOWARU)
+);
+
+INSERT INTO zadanie3.KLIENT (Imie, Nazwisko, Email)
+VALUES ('Jan', 'Kowalski', 'jan.kowalski@gmail.com'),
+       ('Anna', 'Nowak', 'anna.nowak@gmail.com');
+
+INSERT INTO zadanie3.ZAMOWIENIE (Data, ID_KLIENTA)
+VALUES ('2023-10-20', 1),
+       ('2023-10-21', 2);
+
+INSERT INTO zadanie3.TOWAR (Nazwa, Cena)
+VALUES ('Laptop', 3000.00),
+       ('Telefon', 1500.00),
+       ('Tablet', 1200.00);
+
+INSERT INTO zadanie3.ZAMOWIENIE_TOWAR (ID_ZAMOWIENIA, ID_TOWARU, Ilosc)
+VALUES (1, 1, 2), -- Jan Kowalski zamówił 2 laptopy
+       (1, 2, 1), -- Jan Kowalski zamówił 1 telefon
+       (2, 3, 3); -- Anna Nowak zamówiła 3 tablety
+
+Lista zamówień dla wybranego klienta (np. ID_KLIENTA = 1):
+
+SELECT Z.ID_ZAMOWIENIA, Z.Data 
+FROM ZAMOWIENIE Z
+WHERE Z.ID_KLIENTA = 1;
+
+Lista towarów dla wybranego zamówienia (np. ID_ZAMOWIENIA = 1):
+
+SELECT T.Nazwa, ZT.Ilosc 
+FROM TOWAR T
+JOIN ZAMOWIENIE_TOWAR ZT ON T.ID_TOWARU = ZT.ID_TOWARU
+WHERE ZT.ID_ZAMOWIENIA = 1;
+
+Lista zamówień zawierających określony towar (np. ID_TOWARU = 1 - Laptop) wraz z jego ilością na zamówieniu:
+
+SELECT Z.ID_ZAMOWIENIA, Z.Data, ZT.Ilosc
+FROM ZAMOWIENIE Z
+JOIN ZAMOWIENIE_TOWAR ZT ON Z.ID_ZAMOWIENIA = ZT.ID_ZAMOWIENIA
+WHERE ZT.ID_TOWARU = 1;

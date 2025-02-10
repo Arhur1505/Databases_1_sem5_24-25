@@ -1,0 +1,24 @@
+SET SEARCH_PATH TO kurs ;
+
+SELECT 
+    ko.opis AS nazwa_kursu,
+    CAST(
+        (SELECT COUNT(*) 
+         FROM uczest_kurs 
+         WHERE id_kurs = k.id_kurs) * 100.0 /
+        (SELECT COUNT(*) 
+         FROM uczest_kurs) AS DECIMAL(5, 2)
+    ) AS udzial_procentowy_uczestnikow,
+    CAST(
+        (SELECT COUNT(*) 
+         FROM uczest_kurs 
+         WHERE id_kurs = k.id_kurs AND ocena >= 4) * 100.0 /
+        (SELECT COUNT(*) 
+         FROM uczest_kurs 
+         WHERE id_kurs = k.id_kurs) AS DECIMAL(5, 2)
+    ) AS udzial_procentowy_ocen
+FROM 
+    kurs k
+JOIN 
+    kurs_opis ko ON k.id_nazwa = ko.id_nazwa;
+

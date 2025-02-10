@@ -1,0 +1,9 @@
+ssh -L  80:localhost:80 2jozwiak@pascal.fis.agh.edu.pl
+ssh -X  2jozwiak@pascal.fis.agh.edu.pl
+ 
+tunelowanie, scp, ssh -X
+psql -U u2jozwiak 2jozwiak
+\? - help
+\q - wychodzimy
+\h create table
+SQL ; - polecenie SQL kończymy średnikiem

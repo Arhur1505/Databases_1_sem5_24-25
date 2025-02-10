@@ -1,0 +1,36 @@
+8 zajęć: ERD i SQL
+Pozostałe zajęcia: inne języki programowania, RBD i ERD
+
+Kurs: - encja
+1.Nazwa kursu
+2.Uczestnicy - encja
+3.Harmonogram
+4.Prowadzący - encja
+5.Sale - encja
+
+Relacyjna baza danych - RBD:
+rola(user):
+u2jozwiak
+baza danych:
+u2jozwiak
+
+schemat - domyślnie public
+obiekt - table
+lab2
+
+DDL - Data Definition Language:
+CREATE - tworzenie obiektów w RBD
+CREATE SCHEMA
+CREATE TABLE
+ALTER - modyfikowanie obiektów w RDB
+DROP - usuwanie obiektów w RBD
+
+DML - Data Manipulation Languag:
+INSERT - dodawanie danych do tabel
+UPDATE - modyfikacja danych w tabelach
+DELETE - usuwanie danych w tabelach
+SELECT - przeglądanie danych zawartych w tabelach
+
+CREATE SCHEMA kurs
+SET SEARCH_PATH TO kurs
+\dn - wyświetli schema'y

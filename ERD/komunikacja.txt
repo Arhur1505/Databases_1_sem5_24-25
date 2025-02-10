@@ -1,0 +1,92 @@
+CREATE SCHEMA komunikacja;
+SET SEARCH_PATH TO komunikacja;
+
+Tworzenie tabeli dla linii autobusowych/tramwajowych
+CREATE TABLE Line (
+    line_id INT PRIMARY KEY AUTO_INCREMENT,
+    line_number VARCHAR(10) NOT NULL,
+    transport_type ENUM('autobus', 'tramwaj') NOT NULL
+);
+
+Tworzenie tabeli dla przystankÃ³w
+CREATE TABLE Stop (
+    stop_id INT PRIMARY KEY AUTO_INCREMENT,
+    stop_name VARCHAR(100) NOT NULL
+);
+
+Tworzenie tabeli dla tras, gdzie sÄ… zapisane przystanki w danej kolejnoÅ›ci
+CREATE TABLE Route (
+    route_id INT PRIMARY KEY AUTO_INCREMENT,
+    line_id INT NOT NULL,
+    stop_id INT NOT NULL,
+    stop_sequence INT NOT NULL,
+    FOREIGN KEY (line_id) REFERENCES Line(line_id),
+    FOREIGN KEY (stop_id) REFERENCES Stop(stop_id)
+);
+
+Tworzenie tabeli z godzinami odjazdÃ³w z przystankÃ³w
+CREATE TABLE DepartureTime (
+    departure_id INT PRIMARY KEY AUTO_INCREMENT,
+    route_id INT NOT NULL,
+    departure_time TIME NOT NULL,
+    FOREIGN KEY (route_id) REFERENCES Route(route_id)
+);
+
+Tworzenie tabeli z czasami przejazdu miÄ™dzy przystankami na trasie
+CREATE TABLE RouteDistance (
+    route_distance_id INT PRIMARY KEY AUTO_INCREMENT,
+    line_id INT NOT NULL,
+    stop_start_id INT NOT NULL,
+    stop_end_id INT NOT NULL,
+    distance_minutes INT NOT NULL,
+    FOREIGN KEY (line_id) REFERENCES Line(line_id),
+    FOREIGN KEY (stop_start_id) REFERENCES Stop(stop_id),
+    FOREIGN KEY (stop_end_id) REFERENCES Stop(stop_id)
+);
+
+Dodawanie indeksÃ³w dla optymalizacji zapytaÅ„
+CREATE INDEX idx_route_line_stop ON Route(line_id, stop_id);
+CREATE INDEX idx_departure_route ON DepartureTime(route_id);
+CREATE INDEX idx_route_distance_line ON RouteDistance(line_id);
+
+Dodanie przykÅ‚adowych linii
+INSERT INTO Line (line_number, transport_type) VALUES ('10', 'autobus'), ('5', 'tramwaj');
+
+Dodanie przykÅ‚adowych przystankÃ³w
+INSERT INTO Stop (stop_name) VALUES ('Dworzec GÅ‚Ã³wny'), ('Rynek'), ('Centrum'), ('Lotnisko');
+
+Dodanie przykÅ‚adowych tras
+INSERT INTO Route (line_id, stop_id, stop_sequence) VALUES
+(1, 1, 1), (1, 2, 2), (1, 3, 3),
+(2, 2, 1), (2, 3, 2), (2, 4, 3);
+
+Dodanie przykÅ‚adowych godzin odjazdÃ³w
+INSERT INTO DepartureTime (route_id, departure_time) VALUES
+(1, '08:00:00'), (1, '12:00:00'),
+(2, '09:00:00'), (2, '13:00:00');
+
+Dodanie przykÅ‚adowych czasÃ³w przejazdu
+INSERT INTO RouteDistance (line_id, stop_start_id, stop_end_id, distance_minutes) VALUES
+(1, 1, 2, 10), (1, 2, 3, 15),
+(2, 2, 3, 12), (2, 3, 4, 20);
+
+Znalezienie linii zatrzymujÄ…cych siÄ™ na wybranym przystanku
+SELECT DISTINCT l.line_id, l.line_number, l.transport_type
+FROM Line l
+JOIN Route r ON l.line_id = r.line_id
+WHERE r.stop_id = :selected_stop_id;
+
+Znalezienie czasÃ³w odjazdu dla wybranego przystanku i linii
+SELECT dt.departure_time
+FROM DepartureTime dt
+JOIN Route r ON dt.route_id = r.route_id
+WHERE r.stop_id = :selected_stop_id
+  AND r.line_id = :selected_line_id;
+
+Znalezienie przystankÃ³w i czasÃ³w odjazdÃ³w dla wybranej linii
+SELECT s.stop_name, dt.departure_time
+FROM Route r
+JOIN Stop s ON r.stop_id = s.stop_id
+JOIN DepartureTime dt ON r.route_id = dt.route_id
+WHERE r.line_id = :selected_line_id
+ORDER BY r.stop_sequence;

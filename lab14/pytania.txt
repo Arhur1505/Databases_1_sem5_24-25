@@ -1,0 +1,36 @@
+Zadanie – Bazy danych I - Język SQL
+
+1. ( 1pkt ) Napisać zapytanie, którego wynikiem jest wyświetlenie wszystkich osób dostępnych w
+ramach bazy danych z opisem 'W' dla wykładowcy lub 'U' dla uczestnika posortowanych po
+grupie ( wykładowca, uczestnik ) i alfabetycznie wewnątrz grupy.
+
+2. ( 1 pkt ) Napisać zapytanie, które zwróci listę kursantów ( imię, nazwisko, suma opłat ), którzy
+wpłacili na kursy sumę opłat większą od podanej, posortowaną malejąco z sumą opłat.
+
+3. ( 1 pkt ) Napisać zapytanie, którego wynikiem jest wyświetlenie listy średniej opłat (tabela
+uczest_kurs) dla każdego z kursów uporządkowanej malejąco według średniej opłaty.
+
+4. ( 1 pkt ) Napisać zapytanie, którego wynikiem jest wyświetlenie listy sumy opłat (tabela
+uczest_kurs) dla każdego z kursów, uporządkowanej malejąco według sumy opłat. Do realizacji
+zapytania należy zastosować podzapytanie.
+
+5. ( 1 pkt ) Napisać zapytanie podające kursanta, który uzyskał z dowolnego kursu co najmniej raz
+ocenę bardzo dobrą posortowaną alfabetycznie.
+
+6. ( 1 pkt ) Napisać zapytanie zawierające informację o kursancie oraz o liczbie kursów, przy czym
+zamiast liczby kursów podawana jest informacja: „liczba kursów poniżej 4”, „liczba kursów co
+najmniej 4 lub więcej” posortowaną alfabetycznie.
+
+7. ( 1 pkt ) Napisać zapytanie zwracające wykładowców, którzy co najmniej raz spotkali się w
+ramach zajęć z dowolnie wybraną grupą uczestników kursów ( id kursantów: 1, 2, 3 )
+posortowaną alfabetycznie.
+
+8. ( 1 pkt ) Napisać zapytanie, którego wynikiem jest wyświetlenie listy sumy opłat (tabela
+uczest_kurs), imię i nazwisko dla każdego z uczestników uporządkowanej według malejącej
+sumy opłat. Do realizacji zapytania należy zastosować konstrukcję wyrażenia tabelarycznego
+(CTE).
+
+9. ( 2 pkt ) Napisać zapytanie, którego wynikiem jest wyświetlenie wszystkich wykładowców oraz
+zajęć które prowadzą. Do realizacji zapytania wykorzystać funkcję składowaną. Wykładowca
+może prowadzić kilka zajęć lub nie posiadać przypisanych zajęć. Lista zajęć dla każdego
+wykładowcy w jednym polu po przecinku. Wynik posortowany alfabetycznie po wykładowcach.

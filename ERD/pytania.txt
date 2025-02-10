@@ -1,0 +1,47 @@
+Algebra relacyjna – podstawy:
+Algebra relacyjna to proceduralny język zapytań, który definiuje operacje na relacjach (tabelach). 
+Operacje te przekształcają jedną lub więcej relacji w nową relację. 
+Jest ona wykorzystywana do przetwarzania danych w relacyjnych bazach danych.
+1. Selekcja (RESTRICT):
+   - Służy do wybrania wierszy z relacji, które spełniają określony warunek.
+   - Wynik: Relacja zawierająca tylko te krotki, które spełniają podany warunek.
+   - Przykład: RESTRICT Moduły WHERE Poziom=1 → R1
+     Wynikiem są wiersze z tabeli „Moduły”, w których poziom wynosi 1.
+
+2. Rzut (PROJECTION):
+   - Służy do wybrania określonych kolumn z relacji.
+   - Wynik: Nowa relacja zawierająca tylko wybrane atrybuty.
+   - Przykład: PROJECT Moduły (NazwaModułu) → R1
+     Wynikiem jest tabela zawierająca tylko nazwę modułów.
+
+3. Iloczyn kartezjański (PRODUCT):
+   - Łączy każdą krotkę jednej relacji z każdą krotką innej relacji.
+   - Wynik: Relacja zawierająca wszystkie możliwe kombinacje krotek.
+
+4. Suma (UNION):
+   - Łączy krotki z dwóch zgodnych relacji (te same atrybuty i dziedziny).
+   - Wynik: Relacja zawierająca wszystkie krotki występujące w obu relacjach.
+   - Przykład: Wykładowcy UNION Administratorzy → R1
+
+5. Przecięcie (INTERSECTION):
+   - Wybiera wspólne krotki z dwóch zgodnych relacji.
+   - Wynik: Relacja zawierająca tylko wspólne krotki.
+   - Przykład: Wykładowcy INTERSECTION Administratorzy → R1
+
+6. Różnica (DIFFERENCE):
+   - Wybiera krotki, które występują w jednej relacji, ale nie występują w drugiej.
+   - Wynik: Relacja zawierająca tylko różne krotki.
+   - Przykład: Wykładowcy DIFFERENCE Administratorzy → R1
+
+7. Złączenie (JOIN):
+   - Łączy dwie relacje na podstawie wspólnych wartości atrybutów.
+   - Rodzaje złączeń:
+     - Równozłączenie (EQUIJOIN): Porównuje wartości atrybutów w dwóch relacjach.
+     - Naturalne złączenie (NATURAL JOIN): Automatycznie łączy na wspólnych atrybutach.
+     - Złączenie zewnętrzne: Wyróżnia się:
+       - Lewostronne, prawostronne, obustronne (utrzymuje brakujące wartości jako NULL).
+
+8. Iloraz (DIVISION):
+   - Dla dwóch relacji: binarnej i unarnej. Wynikiem jest relacja zawierająca te wartości z relacji binarnej, 
+   które odpowiadają wszystkim wartościom z relacji unarnej.
+

@@ -1,0 +1,54 @@
+SET search_path TO kurs;
+
+ALTER TABLE kurs ADD max_uczest INT ;
+UPDATE kurs SET max_uczest=10;
+
+CREATE OR REPLACE FUNCTION dodaj_uczestnika_do_kursu(
+    p_id_uczestnik INT,
+    p_id_kurs INT
+) RETURNS INT AS $$
+DECLARE
+    max_uczest_var INT;
+    obecni_uczest INT;
+BEGIN
+    SET search_path TO kurs;
+
+    SELECT max_uczest INTO max_uczest_var
+    FROM kurs
+    WHERE id_kurs = p_id_kurs;
+
+    IF NOT FOUND THEN
+        RETURN 2;
+    END IF;
+
+    SELECT COUNT(*) INTO obecni_uczest
+    FROM uczest_kurs
+    WHERE id_kurs = p_id_kurs;
+
+    IF EXISTS (
+        SELECT 1
+        FROM uczest_kurs
+        WHERE id_kurs = p_id_kurs AND id_uczest = p_id_uczestnik
+    ) THEN
+        RETURN 1;
+    END IF;
+
+    IF obecni_uczest >= max_uczest_var THEN
+        RETURN 2;
+    END IF;
+
+    INSERT INTO uczest_kurs (id_uczest, id_kurs)
+    VALUES (p_id_uczestnik, p_id_kurs);
+
+    INSERT INTO uczest_zaj (id_kurs, id_zaj, id_uczest, obec)
+    SELECT z.id_kurs, z.id_zaj, p_id_uczestnik, 0
+    FROM zajecia z
+    WHERE z.id_kurs = p_id_kurs;
+
+    RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT dodaj_uczestnika_do_kursu(2, 1);
+
+DROP FUNCTION IF EXISTS dodaj_uczestnika_do_kursu(INT, INT);

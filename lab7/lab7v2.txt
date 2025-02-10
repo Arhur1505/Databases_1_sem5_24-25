@@ -1,0 +1,31 @@
+CREATE OR REPLACE FUNCTION equ_tables(
+    a FLOAT, 
+    b FLOAT, 
+    c FLOAT, 
+    x_start FLOAT, 
+    x_step FLOAT, 
+    records_count INT
+)
+RETURNS TABLE(i INT, x FLOAT, y FLOAT) AS $$
+DECLARE
+    i INT := 1;
+    x_value FLOAT := x_start;
+BEGIN
+    WHILE i <= records_count LOOP
+        x := x_value;
+        y := a * x_value * x_value + b * x_value + c;
+        i := i;  
+
+       RETURN NEXT;
+
+        x_value := x_value + x_step;
+        i := i + 1;
+    END LOOP;
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+
+select * from equ_tables(1,2,1,1,1,10);
+
+DROP function equ_tables(float, float, float, float, float, int);

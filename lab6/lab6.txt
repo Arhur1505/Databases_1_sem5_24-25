@@ -1,0 +1,115 @@
+1. Obecność na zajęciach
+
+WITH Presence AS (
+    SELECT 
+        u.nazwisko,
+        u.imie,
+        z.id_zaj,
+        uz.obec
+    FROM uczest_zaj uz
+    JOIN uczestnik u ON uz.id_uczest = u.id_uczestnik
+    JOIN zajecia z ON uz.id_kurs = z.id_kurs AND uz.id_zaj = z.id_zaj
+    WHERE uz.id_kurs = 1  -- Specify the course ID here
+),
+PivotedPresence AS (
+    SELECT 
+        nazwisko,
+        imie,
+        MAX(CASE WHEN id_zaj = 1 THEN obec ELSE 0 END) AS z1,
+        MAX(CASE WHEN id_zaj = 2 THEN obec ELSE 0 END) AS z2,
+        MAX(CASE WHEN id_zaj = 3 THEN obec ELSE 0 END) AS z3,
+        MAX(CASE WHEN id_zaj = 4 THEN obec ELSE 0 END) AS z4,
+        MAX(CASE WHEN id_zaj = 5 THEN obec ELSE 0 END) AS z5,
+        MAX(CASE WHEN id_zaj = 6 THEN obec ELSE 0 END) AS z6,
+        MAX(CASE WHEN id_zaj = 7 THEN obec ELSE 0 END) AS z7,
+        MAX(CASE WHEN id_zaj = 8 THEN obec ELSE 0 END) AS z8,
+        MAX(CASE WHEN id_zaj = 9 THEN obec ELSE 0 END) AS z9,
+        MAX(CASE WHEN id_zaj = 10 THEN obec ELSE 0 END) AS z10
+    FROM Presence
+    GROUP BY nazwisko, imie
+)
+SELECT 
+    nazwisko,
+    imie,
+    z1, z2, z3, z4, z5, z6, z7, z8, z9, z10,
+    (z1 + z2 + z3 + z4 + z5 + z6 + z7 + z8 + z9 + z10) AS sum
+FROM PivotedPresence
+ORDER BY nazwisko, imie;
+
+2. Uczestnitwo w kursach
+
+WITH CourseAttendance AS (
+    SELECT 
+        k.id_kurs,
+        ko.opis AS kurs,
+        k.id_grupa AS grupa,
+        z.id_zaj,
+        SUM(uz.obec) AS liczba_uczestnikow
+    FROM uczest_zaj uz
+    JOIN zajecia z ON uz.id_kurs = z.id_kurs AND uz.id_zaj = z.id_zaj
+    JOIN kurs k ON uz.id_kurs = k.id_kurs
+    JOIN kurs_opis ko ON k.id_nazwa = ko.id_nazwa
+    GROUP BY k.id_kurs, ko.opis, k.id_grupa, z.id_zaj
+),
+PivotedAttendance AS (
+    SELECT 
+        kurs,
+        grupa,
+        MAX(CASE WHEN id_zaj = 1 THEN liczba_uczestnikow ELSE 0 END) AS z1,
+        MAX(CASE WHEN id_zaj = 2 THEN liczba_uczestnikow ELSE 0 END) AS z2,
+        MAX(CASE WHEN id_zaj = 3 THEN liczba_uczestnikow ELSE 0 END) AS z3,
+        MAX(CASE WHEN id_zaj = 4 THEN liczba_uczestnikow ELSE 0 END) AS z4,
+        MAX(CASE WHEN id_zaj = 5 THEN liczba_uczestnikow ELSE 0 END) AS z5,
+        MAX(CASE WHEN id_zaj = 6 THEN liczba_uczestnikow ELSE 0 END) AS z6,
+        MAX(CASE WHEN id_zaj = 7 THEN liczba_uczestnikow ELSE 0 END) AS z7,
+        MAX(CASE WHEN id_zaj = 8 THEN liczba_uczestnikow ELSE 0 END) AS z8,
+        MAX(CASE WHEN id_zaj = 9 THEN liczba_uczestnikow ELSE 0 END) AS z9,
+        MAX(CASE WHEN id_zaj = 10 THEN liczba_uczestnikow ELSE 0 END) AS z10
+    FROM CourseAttendance
+    GROUP BY kurs, grupa
+)
+SELECT 
+    kurs,
+    grupa,
+    z1, z2, z3, z4, z5, z6, z7, z8, z9, z10,
+    (z1 + z2 + z3 + z4 + z5 + z6 + z7 + z8 + z9 + z10) AS sum
+FROM PivotedAttendance
+ORDER BY kurs, grupa;
+
+3. Wykładowcy na kursach.
+
+WITH InstructorCourses AS (
+    SELECT 
+        w.nazwisko,
+        w.imie,
+        k.id_kurs,
+        1 AS prowadzi_kurs
+    FROM wykl_kurs wk
+    JOIN wykladowca w ON wk.id_wykl = w.id_wykladowca
+    JOIN kurs k ON wk.id_kurs = k.id_kurs
+),
+PivotedInstructorCourses AS (
+    SELECT 
+        nazwisko,
+        imie,
+        MAX(CASE WHEN id_kurs = 1 THEN prowadzi_kurs ELSE 0 END) AS k1,
+        MAX(CASE WHEN id_kurs = 2 THEN prowadzi_kurs ELSE 0 END) AS k2,
+        MAX(CASE WHEN id_kurs = 3 THEN prowadzi_kurs ELSE 0 END) AS k3,
+        MAX(CASE WHEN id_kurs = 4 THEN prowadzi_kurs ELSE 0 END) AS k4,
+        MAX(CASE WHEN id_kurs = 5 THEN prowadzi_kurs ELSE 0 END) AS k5,
+        MAX(CASE WHEN id_kurs = 6 THEN prowadzi_kurs ELSE 0 END) AS k6,
+        MAX(CASE WHEN id_kurs = 7 THEN prowadzi_kurs ELSE 0 END) AS k7,
+        MAX(CASE WHEN id_kurs = 8 THEN prowadzi_kurs ELSE 0 END) AS k8,
+        MAX(CASE WHEN id_kurs = 9 THEN prowadzi_kurs ELSE 0 END) AS k9,
+        MAX(CASE WHEN id_kurs = 10 THEN prowadzi_kurs ELSE 0 END) AS k10,
+        MAX(CASE WHEN id_kurs = 11 THEN prowadzi_kurs ELSE 0 END) AS k11
+    FROM InstructorCourses
+    GROUP BY nazwisko, imie
+)
+SELECT 
+    nazwisko,
+    imie,
+    k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11,
+    (k1 + k2 + k3 + k4 + k5 + k6 + k7 + k8 + k9 + k10 + k11) AS sum
+FROM PivotedInstructorCourses
+ORDER BY nazwisko, imie;

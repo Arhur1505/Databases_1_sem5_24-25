@@ -1,0 +1,42 @@
+------------------------------------------------------------
+--
+-- ZAJECIA 3 - BD1
+--
+------------------------------------------------------------
+-- Tworzenie schematu dla bazy danych KURS --
+CREATE SCHEMA kurs ;
+SET SEARCH_PATH TO kurs ;
+
+-- Tworzenie tabel --
+create table uczestnik ( id_uczestnik int, nazwisko varchar(30), imie varchar(30) ) ;
+create table kurs ( id_kurs int, id_grupa int, id_nazwa int, termin varchar(30) ) ;
+create table wykladowca ( id_wykladowca int, nazwisko varchar(30), imie varchar(30) ) ;
+create table kurs_opis ( id_nazwa int, opis varchar(30) ) ;
+create table uczest_kurs ( id_uczest int, id_kurs int ) ;
+create table wykl_kurs ( id_wykl int, id_kurs int ) ;
+--
+-- modyfikacja tabel - dodanie klucza glownego --
+alter table kurs add primary key (id_kurs) ;
+alter table uczestnik add primary key (id_uczestnik) ;
+alter table wykladowca add primary key (id_wykladowca) ;
+alter table kurs_opis add primary key (id_nazwa) ;
+alter table uczest_kurs add primary key (id_uczest, id_kurs) ;
+alter table wykl_kurs add primary key (id_wykl, id_kurs) ;
+--
+-- modyfikacja tabel - dodanie refencji klucza obcego --
+alter table uczest_kurs add foreign key (id_uczest) references uczestnik ( id_uczestnik) ;
+alter table uczest_kurs add foreign key (id_kurs) references kurs ( id_kurs) ;
+alter table wykl_kurs add foreign key (id_kurs) references kurs ( id_kurs) ;
+alter table wykl_kurs add foreign key (id_wykl) references wykladowca ( id_wykladowca) ;
+alter table kurs add foreign key (id_nazwa) references kurs_opis ( id_nazwa) ;
+--
+alter table uczest_kurs add oplata decimal(8,2) ;
+alter table uczest_kurs add ocena decimal(5,2) ;
+
+CREATE TABLE zajecia ( id_kurs int, id_zaj int );
+ALTER TABLE zajecia ADD PRIMARY KEY ( id_kurs, id_zaj ); 
+ALTER TABLE zajecia ADD FOREIGN KEY ( id_kurs ) REFERENCES kurs ( id_kurs ) ;
+CREATE TABLE uczest_zaj ( id_kurs int, id_zaj int, id_uczest int, obec int);
+ALTER TABLE uczest_zaj ADD PRIMARY KEY ( id_kurs, id_zaj, id_uczest );
+ALTER TABLE uczest_zaj ADD FOREIGN KEY ( id_kurs, id_zaj) REFERENCES zajecia ( id_kurs, id_zaj ) ;
+ALTER TABLE uczest_zaj ADD FOREIGN KEY ( id_uczest) REFERENCES uczestnik ( id_uczestnik ) ;

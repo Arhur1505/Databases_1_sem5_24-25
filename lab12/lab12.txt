@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sql.h>
+#include <sqlext.h>
+#include <string.h>
+
+#define FNAME_LEN 255
+#define LNAME_LEN 255
+#define EMAIL_LEN 255
+#define TRUE 1
+#define FALSE 0
+
+SQLLEN newID;
+SQLLEN lenFirstName = 0, lenLastName = 0, lenEmail = 0;
+SQLCHAR fname[FNAME_LEN];
+SQLCHAR lname[LNAME_LEN];
+SQLCHAR email[EMAIL_LEN];
+
+void print_odbc_error(char *fn, SQLHANDLE handle, SQLSMALLINT type);
+
+int main() {
+    FILE *file = fopen("data.csv", "r");  // Open CSV file
+    if (!file) {
+        printf("Unable to open file\n");
+        return -1;
+    }
+
+    // Set up ODBC environment
+    SQLHENV henv = SQL_NULL_HENV;
+    SQLHDBC hdbc = SQL_NULL_HDBC;
+    SQLHSTMT hInsertStmt = SQL_NULL_HSTMT;
+    SQLRETURN retcode;
+
+    // Allocate environment
+    retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+        print_odbc_error("SQLAllocHandle(SQL_HANDLE_ENV)", henv, SQL_HANDLE_ENV);
+        return -1;
+    }
+
+    // Set ODBC version
+    retcode = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER*)SQL_OV_ODBC3, 0);
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+        print_odbc_error("SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION)", henv, SQL_HANDLE_ENV);
+        return -1;
+    }
+
+    // Allocate connection
+    retcode = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+        print_odbc_error("SQLAllocHandle(SQL_HANDLE_DBC)", hdbc, SQL_HANDLE_DBC);
+        return -1;
+    }
+
+    // Connect to DSN
+    retcode = SQLConnect(hdbc, (SQLCHAR*)"BD1Lab", SQL_NTS, NULL, 0, NULL, 0);
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+        print_odbc_error("SQLConnect(DSN BD1Lab)", hdbc, SQL_HANDLE_DBC);
+        return -1;
+    }
+
+    // Allocate Statement Handle
+    retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hInsertStmt);
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+        print_odbc_error("SQLAllocHandle(SQL_HANDLE_STMT)", hInsertStmt, SQL_HANDLE_STMT);
+        return -1;
+    }
+
+    // Prepare INSERT statement
+    retcode = SQLPrepare(hInsertStmt, (SQLCHAR*)
+                         "INSERT INTO lab11.person (fname, lname, email) VALUES (?, ?, ?)", SQL_NTS);
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+        print_odbc_error("SQLPrepare(INSERT)", hInsertStmt, SQL_HANDLE_STMT);
+        return -1;
+    }
+
+    // Bind parameters
+    retcode = SQLBindParameter(hInsertStmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, FNAME_LEN, 0, fname, FNAME_LEN, &lenFirstName);
+    retcode = SQLBindParameter(hInsertStmt, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, LNAME_LEN, 0, lname, LNAME_LEN, &lenLastName);
+    retcode = SQLBindParameter(hInsertStmt, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, EMAIL_LEN, 0, email, EMAIL_LEN, &lenEmail);
+
+    // Read CSV data and insert it
+    while (fscanf(file, "%255[^,],%255[^,],%255s\n", fname, lname, email) == 3) {
+        lenFirstName = strlen((char*)fname);
+        lenLastName = strlen((char*)lname);
+        lenEmail = strlen((char*)email);
+
+        retcode = SQLExecute(hInsertStmt);
+        if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+            print_odbc_error("SQLExecute(INSERT)", hInsertStmt, SQL_HANDLE_STMT);
+            return -1;
+        }
+    }
+
+    printf("Data successfully inserted into lab11.person table.\n");
+
+    // Commit the transaction
+    retcode = SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
+    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+        print_odbc_error("SQLEndTran(SQL_COMMIT)", hdbc, SQL_HANDLE_DBC);
+        return -1;
+    }
+
+    // Free handles
+    SQLFreeHandle(SQL_HANDLE_STMT, hInsertStmt);
+    SQLDisconnect(hdbc);
+    SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+    SQLFreeHandle(SQL_HANDLE_ENV, henv);
+
+    fclose(file);  // Close the file
+
+    return 0;
+}
+
+void print_odbc_error(char *fn, SQLHANDLE handle, SQLSMALLINT type) {
+    SQLINTEGER i = 0;
+    SQLINTEGER NativeError;
+    SQLCHAR SQLState[7];
+    SQLCHAR MessageText[256];
+    SQLSMALLINT TextLength;
+    SQLRETURN ret;
+
+    fprintf(stderr, "\nError %s\n", fn);
+    do {
+        ret = SQLGetDiagRec(type, handle, ++i, SQLState, &NativeError, MessageText, sizeof(MessageText), &TextLength);
+        if (SQL_SUCCEEDED(ret)) {
+            printf("%s:%ld:%ld:%s\n", SQLState, (long)i, (long)NativeError, MessageText);
+        }
+    } while (ret == SQL_SUCCESS);
+}
+

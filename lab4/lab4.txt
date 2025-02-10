@@ -1,0 +1,43 @@
+Praca 3 ( zadanie w ramach lab.4 ). [Treść zadania]
+	
+W ramach pracy należy opracować poniższe zapytania SQL do bazy danych KURS. W ramach zadania wykorzystujemy standardowe polecenie SQL ( w punkcie 8 proszę wykorzystać opcję LIMIT ).
+
+SELECT [atrybuty]
+FROM [relacje]
+WHERE [warunki]
+GROUP BY [atrybuty grupujace]
+HAVING [warunki]
+ORDER BY [atrybuty selekcji]
+
+Liczba osób na poszczególnych kursach.
+    Nazwy atrybutów w wynikowej tabeli: nazwa_kursu , liczba_osób. 
+Suma opłat za poszczególne kursy.
+    Nazwy atrybutów w wynikowej tabeli: nazwa_kursu, suma_opłat. 
+Średnia ocen na poszczegónych kursach.
+    Nazwy atrybutów w wynikowej tabeli: nazwa_kursu, średnia ocen.
+Lista wykładowców, którzy mają co najmniej jeden kurs.
+    Nazwy atrybutów w wynikowej tabeli: imie, nazwisko, liczba_kursow.
+Lista wykładowców, którzy nie mają żadnego kursu.
+    Nazwy atrybutów w wynikowej tabeli: imie, nazwisko.
+Lista osób, którzy uczestniczyli w co najmniej dwóch kursach.
+    Nazwy atrybutów w wynikowej tabeli: imie, nazwisko.
+Lista uczestników zawierająca liczbę kursów uczestnika, sumę kwot wpłaconych przez uczestnika na kursy, średnią z uzyskanych ocen, minimalną i maksymalną ocena dla każdego uczestnika kursu.
+    Nazwy atrybutów w wynikowej tabeli: imie, nazwisko, liczba_kursow, suma_oplat, srednia_oc, min_oc, max_oc
+Uczestnik, który wpłacił najwięcej za kursy.
+    Nazwy atrybutów w wynikowej tabeli: imie, nazwisko, kwota.
+Lista zawierająca nazwisko i imię wykładowcy powiązana z uczestnikami, którzy uczestniczą w kursach prowadzonych przez danego wykładowcę. Nazwisko uczestnika dla danego wykładowcy występuje jednokrotnie.
+    Nazwy atrybutów w wynikowej tabeli: id_w, imie_w, nazwisko_w, id_u, imie_u, nazwisko_u.
+Lista zawierająca nazwisko i imię wykładowcy z liczbą uczestników dla których wykładowca prowadzi zajęcia. Uczestnik jest liczony tylko raz.
+    Nazwy atrybutów w wynikowej tabeli: id_w, imie_w, nazwisko_w, liczba_u.
+
+Z1
+SELECT o.opis AS "nazwa_kursu", COUNT(*) AS "liczba_osob" FROM kurs_opis o, kurs k, uczest_kurs u WHERE o.id_nazwa = k.id_nazwa and k.id_kurs = u.id_kurs GROUP BY o.opis ORDER BY o.opis;
+
+Z2
+SELECT o.opis AS "nazwa_kursu", SUM(oplata) AS "suma_oplat" FROM kurs_opis o, kurs k, uczest_kurs u WHERE o.id_nazwa = k.id_nazwa and k.id_kurs = u.id_kurs GROUP BY o.opis ORDER BY o.opis;
+
+Z3
+SELECT o.opis AS "nazwa_kursu", AVG(ocena) AS "srednia_ocem" FROM kurs_opis o, kurs k, uczest_kurs u WHERE o.id_nazwa = k.id_nazwa and k.id_kurs = u.id_kurs GROUP BY o.opis ORDER BY o.opis;
+
+Z4
+

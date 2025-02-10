@@ -1,0 +1,114 @@
+Zadanie 1
+
+CREATE OR REPLACE FUNCTION equ_tables(
+    a INT,
+    b INT,
+    c INT,
+    x_start INT,
+    x_increment INT,
+    record_count INT
+) RETURNS TABLE (
+    i INT,
+    x INT,
+    y INT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        gs AS i,
+        x_start + (gs - 1) * x_increment AS x,
+        a * POWER((x_start + (gs - 1) * x_increment), 2)::INT + b * (x_start + (gs - 1) * x_increment) + c AS y
+    FROM generate_series(1, record_count) AS gs;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM equ_tables(1, 2, 1, 1, 1, 10);
+
+DROP FUNCTION equ_tables(INT, INT, INT, INT, INT, INT);
+
+Zadanie 2
+
+CREATE OR REPLACE FUNCTION equ_solve(
+    a NUMERIC,
+    b NUMERIC,
+    c NUMERIC
+) RETURNS TEXT AS $$
+DECLARE
+    delta NUMERIC;
+    x1 NUMERIC;
+    x2 NUMERIC;
+    real_part NUMERIC;
+    imag_part NUMERIC;
+    result TEXT;
+BEGIN
+    delta := b * b - 4 * a * c;
+
+    RAISE INFO 'DELTA = %', delta;
+
+    IF delta > 0 THEN
+        -- Dwa rzeczywiste pierwiastki
+        x1 := (-b - sqrt(delta)) / (2 * a);
+        x2 := (-b + sqrt(delta)) / (2 * a);
+        RAISE INFO 'Rozwiazanie posiada dwa rzeczywiste pierwiastki';
+        RAISE INFO 'x1 = %', x1;
+        RAISE INFO 'x2 = %', x2;
+        result := format('(x1 = %s ),(x2 = %s )', x1, x2);
+    ELSIF delta = 0 THEN
+        x1 := -b / (2 * a);
+        RAISE INFO 'Rozwiazanie posiada jeden podwójny pierwiastek';
+        RAISE INFO 'x1 = %', x1;
+        result := format('(x1 = %s )', x1);
+    ELSE
+        real_part := -b / (2 * a);
+        imag_part := sqrt(-delta) / (2 * a);
+        RAISE INFO 'Rozwiazanie w dziedzinie liczb zespolonych';
+        RAISE INFO 'x1 = % + %i', real_part, imag_part;
+        RAISE INFO 'x2 = % - %i', real_part, imag_part;
+        result := format('(x1 = %s + %si ),(x2 = %s - %si )',
+                         real_part, imag_part, real_part, imag_part);
+    END IF;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT equ_solve(1, 10, 1);
+SELECT equ_solve(10, 5, 1);
+
+DROP FUNCTION equ_solve(NUMERIC, NUMERIC, NUMERIC);
+
+Zadanie 3
+
+CREATE OR REPLACE FUNCTION uczest_wykladowcy(uczestnik_id INT)
+RETURNS TABLE(w_nazwisko VARCHAR, w_imie VARCHAR) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT DISTINCT w.nazwisko, w.imie
+    FROM uczest_kurs uk
+    JOIN wykl_kurs wk USING (id_kurs)
+    JOIN wykladowca w ON wk.id_wykl = w.id_wykladowca
+    WHERE uk.id_uczest = uczestnik_id;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM uczest_wykladowcy(1);
+
+DROP FUNCTION IF EXISTS uczest_wykladowcy(INT);
+
+Zadanie 4
+
+CREATE OR REPLACE FUNCTION uczest_kurs(uczestnik_id INT)
+RETURNS TABLE(z_opis VARCHAR) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT DISTINCT ko.opis
+    FROM uczest_kurs uk
+    JOIN kurs k ON uk.id_kurs = k.id_kurs
+    JOIN kurs_opis ko ON k.id_nazwa = ko.id_nazwa
+    WHERE uk.id_uczest = uczestnik_id;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM uczest_kurs(1);
+
+DROP FUNCTION IF EXISTS uczest_kurs(INT);
